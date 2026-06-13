@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('content')   
+@section('content')
  <style>
         :root {
             --primary-gradient-start: #667eea;
@@ -375,16 +375,16 @@
             .form-body {
                 padding: 1.5rem;
             }
-            
+
             .headline {
                 font-size: 1.75rem;
             }
-            
+
             .bank-logo {
                 width: 60px;
                 height: 60px;
             }
-            
+
             .bank-logo i {
                 font-size: 2rem;
             }
@@ -428,14 +428,17 @@
                         </h3>
                         <p>Nhập thông tin chi tiết để thực hiện giao dịch</p>
                     </div>
-                    
+
                     <div class="form-body">
                         <!-- Alert Messages (will be shown dynamically) -->
                         <div id="alertContainer"></div>
 
+                        <!-- Back to Home Button -->
+                        <a href="{{ route('home') }}" class="btn btn-outline-secondary mb-3">Quay lại trang chủ</a>
+
                         <form method="POST" action="{{ route('transaction.store') }}" id="transactionForm" novalidate>
                             @csrf
-                            
+
                             <!-- Sender Field -->
                             <div class="form-group">
                                 <label class="form-label">
@@ -447,9 +450,9 @@
                                 </label>
                                 <div class="input-icon">
                                     <i class="fas fa-user"></i>
-                                    <input type="text" 
-                                           name="sender" 
-                                           class="form-control" 
+                                    <input type="text"
+                                           name="sender"
+                                           class="form-control"
                                            placeholder="Nhập địa chỉ ví người gửi"
                                            autocomplete="off">
                                 </div>
@@ -466,9 +469,9 @@
                                 </label>
                                 <div class="input-icon">
                                     <i class="fas fa-user-plus"></i>
-                                    <input type="text" 
-                                           name="receiver" 
-                                           class="form-control" 
+                                    <input type="text"
+                                           name="receiver"
+                                           class="form-control"
                                            placeholder="Nhập địa chỉ ví người nhận"
                                            autocomplete="off">
                                 </div>
@@ -483,10 +486,10 @@
                                 <div class="amount-wrapper">
                                     <div class="input-icon">
                                         <i class="fas fa-dollar-sign"></i>
-                                        <input type="text" 
-                                               name="amount" 
-                                               class="form-control" 
-                                               placeholder="Nhập số tiền hoặc bất kỳ giá trị nào" 
+                                        <input type="text"
+                                               name="amount"
+                                               class="form-control"
+                                               placeholder="Nhập số tiền hoặc bất kỳ giá trị nào"
                                                autocomplete="off">
                                     </div>
                                     <span class="currency-symbol">VND</span>
@@ -550,19 +553,19 @@
                 const alertContainer = document.getElementById('alertContainer');
                 const alertDiv = document.createElement('div');
                 alertDiv.className = `alert-message alert-${type}`;
-                
+
                 let icon = 'fa-exclamation-circle';
                 if (type === 'success') icon = 'fa-check-circle';
                 if (type === 'warning') icon = 'fa-exclamation-triangle';
-                
+
                 alertDiv.innerHTML = `
                     <i class="fas ${icon}"></i>
                     <span>${message}</span>
                     <i class="fas fa-times ms-auto" style="cursor: pointer;" onclick="this.parentElement.remove()"></i>
                 `;
-                
+
                 alertContainer.appendChild(alertDiv);
-                
+
                 // Auto remove after 5 seconds
                 setTimeout(() => {
                     if (alertDiv.parentElement) {
@@ -575,28 +578,28 @@
             // Real-time validation
             function validateForm() {
                 let isValid = true;
-                
+
                 if (!validateAddress(senderInput.value)) {
                     senderInput.style.borderColor = '#ef4444';
                     isValid = false;
                 } else {
                     senderInput.style.borderColor = '#10b981';
                 }
-                
+
                 if (!validateAddress(receiverInput.value)) {
                     receiverInput.style.borderColor = '#ef4444';
                     isValid = false;
                 } else {
                     receiverInput.style.borderColor = '#10b981';
                 }
-                
+
                 if (!validateAmount(parseFloat(amountInput.value))) {
                     amountInput.style.borderColor = '#ef4444';
                     isValid = false;
                 } else {
                     amountInput.style.borderColor = '#10b981';
                 }
-                
+
                 return isValid;
             }
 
@@ -609,54 +612,15 @@
 
             // Handle form submission
             form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
                 if (!validateForm()) {
+                    e.preventDefault();
                     showAlert('Vui lòng kiểm tra lại thông tin giao dịch!', 'warning');
                     return;
                 }
-                
-                // Show loading state
+
+                // Show loading state while form submits
                 submitBtn.classList.add('loading');
-                const originalHtml = submitBtn.innerHTML;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý giao dịch...';
-                
-                // Simulate API call (replace with actual form submission)
-                setTimeout(() => {
-                    // Create transaction preview
-                    const transaction = {
-                        sender: senderInput.value,
-                        receiver: receiverInput.value,
-                        amount: parseFloat(amountInput.value),
-                        timestamp: new Date().toISOString(),
-                        transactionId: '0x' + Math.random().toString(36).substr(2, 40)
-                    };
-                    
-                    // Store transaction in localStorage for demo
-                    let transactions = JSON.parse(localStorage.getItem('blockchain_transactions') || '[]');
-                    transactions.unshift(transaction);
-                    localStorage.setItem('blockchain_transactions', JSON.stringify(transactions));
-                    
-                    // Show success message
-                    showAlert(`
-                        <strong>Giao dịch thành công!</strong><br>
-                        Mã giao dịch: ${transaction.transactionId.substring(0, 16)}...<br>
-                        Số tiền: ${transaction.amount.toLocaleString()} VND
-                    `, 'success');
-                    
-                    // Reset form
-                    form.reset();
-                    
-                    // Reset button
-                    submitBtn.classList.remove('loading');
-                    submitBtn.innerHTML = originalHtml;
-                    
-                    // Reset border colors
-                    [senderInput, receiverInput, amountInput].forEach(input => {
-                        input.style.borderColor = '#e5e7eb';
-                    });
-                    
-                }, 1500);
             });
 
             // Add tooltip functionality
@@ -676,20 +640,20 @@
                     tooltipDiv.style.zIndex = '1000';
                     tooltipDiv.style.maxWidth = '250px';
                     tooltipDiv.style.whiteSpace = 'normal';
-                    
+
                     const rect = this.getBoundingClientRect();
                     tooltipDiv.style.top = rect.bottom + 5 + 'px';
                     tooltipDiv.style.left = rect.left + 'px';
-                    
+
                     document.body.appendChild(tooltipDiv);
-                    
+
                     this.addEventListener('mouseleave', function() {
                         tooltipDiv.remove();
                     });
                 });
             });
         });
-        
+
         // Add CSS for custom tooltip
         const style = document.createElement('style');
         style.textContent = `

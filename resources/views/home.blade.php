@@ -387,19 +387,19 @@
         .hero-section {
             padding: 2rem 1.5rem;
         }
-        
+
         .hero-title {
             font-size: 2rem;
         }
-        
+
         .hero-subtitle {
             font-size: 1rem;
         }
-        
+
         .stat-card {
             margin-bottom: 1rem;
         }
-        
+
         .transaction-item {
             flex-direction: column;
             align-items: flex-start;
@@ -454,7 +454,7 @@
                     <div class="stat-icon">
                         <i class="fas fa-cubes"></i>
                     </div>
-                    <div class="stat-value" id="totalBlocks">0</div>
+                    <div class="stat-value">{{ number_format($totalBlocks) }}</div>
                     <div class="stat-label">Tổng số Blocks</div>
                     <div class="stat-trend trend-up">
                         <i class="fas fa-arrow-up"></i> +12%
@@ -466,7 +466,7 @@
                     <div class="stat-icon">
                         <i class="fas fa-exchange-alt"></i>
                     </div>
-                    <div class="stat-value" id="totalTransactions">0</div>
+                    <div class="stat-value">{{ number_format($totalTransactions) }}</div>
                     <div class="stat-label">Tổng giao dịch</div>
                     <div class="stat-trend trend-up">
                         <i class="fas fa-arrow-up"></i> +8%
@@ -478,7 +478,7 @@
                     <div class="stat-icon">
                         <i class="fas fa-chart-line"></i>
                     </div>
-                    <div class="stat-value" id="totalVolume">0</div>
+                    <div class="stat-value">{{ number_format($totalVolume, 0, ',', '.') }} VND</div>
                     <div class="stat-label">Khối lượng giao dịch</div>
                     <div class="stat-trend trend-up">
                         <i class="fas fa-arrow-up"></i> +23%
@@ -490,7 +490,7 @@
                     <div class="stat-icon">
                         <i class="fas fa-users"></i>
                     </div>
-                    <div class="stat-value" id="activeUsers">0</div>
+                    <div class="stat-value">{{ number_format($activeUsers) }}</div>
                     <div class="stat-label">Người dùng hoạt động</div>
                     <div class="stat-trend trend-up">
                         <i class="fas fa-arrow-up"></i> +5%
@@ -581,220 +581,47 @@
             </div>
         </div>
     </div>
-</div>
-
-<script>
-    // Mock data for demonstration
-    const mockStats = {
-        totalBlocks: 12456,
-        totalTransactions: 89432,
-        totalVolume: '2.5B',
-        activeUsers: 1234
-    };
-
-    const mockTransactions = [
-        {
-            hash: '0x8f5a1c3b9e2d4f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a',
-            type: 'transfer',
-            amount: 1500000,
-            from: '0x742d35Cc6634C0532925a3b844Bc9e7598Fc1eB9',
-            to: '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B',
-            timestamp: '2024-01-15 10:30:25',
-            status: 'success'
-        },
-        {
-            hash: '0x9e2d4f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d',
-            type: 'transfer',
-            amount: 2500000,
-            from: '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B',
-            to: '0x742d35Cc6634C0532925a3b844Bc9e7598Fc1eB9',
-            timestamp: '2024-01-15 10:35:42',
-            status: 'success'
-        },
-        {
-            hash: '0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2',
-            type: 'contract',
-            amount: 5000000,
-            from: '0x742d35Cc6634C0532925a3b844Bc9e7598Fc1eB9',
-            to: 'Smart Contract',
-            timestamp: '2024-01-15 10:42:18',
-            status: 'pending'
-        },
-        {
-            hash: '0xb2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2',
-            type: 'transfer',
-            amount: 800000,
-            from: '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B',
-            to: '0x742d35Cc6634C0532925a3b844Bc9e7598Fc1eB9',
-            timestamp: '2024-01-15 10:48:03',
-            status: 'success'
-        }
-    ];
-
-    // Update statistics
-    function updateStats() {
-        document.getElementById('totalBlocks').textContent = mockStats.totalBlocks.toLocaleString();
-        document.getElementById('totalTransactions').textContent = mockStats.totalTransactions.toLocaleString();
-        document.getElementById('totalVolume').textContent = mockStats.totalVolume;
-        document.getElementById('activeUsers').textContent = mockStats.activeUsers.toLocaleString();
-        
-        // Animate numbers
-        animateNumber('totalBlocks', 0, mockStats.totalBlocks, 1000);
-        animateNumber('totalTransactions', 0, mockStats.totalTransactions, 1000);
-    }
-
-    function animateNumber(elementId, start, end, duration) {
-        const element = document.getElementById(elementId);
-        const range = end - start;
-        const increment = range / (duration / 16);
-        let current = start;
-        
-        const timer = setInterval(() => {
-            current += increment;
-            if (current >= end) {
-                clearInterval(timer);
-                current = end;
-            }
-            element.textContent = Math.floor(current).toLocaleString();
-        }, 16);
-    }
-
-    // Format amount
-    function formatAmount(amount) {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-    }
-
-    // Truncate hash
-    function truncateHash(hash) {
-        if (!hash) return '';
-        if (hash.length <= 20) return hash;
-        return hash.substring(0, 10) + '...' + hash.substring(hash.length - 8);
-    }
-
-    // Format time
-    function formatTime(timestamp) {
-        const date = new Date(timestamp);
-        const now = new Date();
-        const diff = Math.floor((now - date) / 1000);
-        
-        if (diff < 60) return `${diff} giây trước`;
-        if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
-        if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
-        return date.toLocaleDateString('vi-VN');
-    }
-
-    // Render transactions
-    function renderTransactions(transactions) {
-        const container = document.getElementById('recentTransactions');
-        
-        if (!transactions || transactions.length === 0) {
-            container.innerHTML = `
+        <div id="recentTransactions">
+            @if($recentBlocks->isEmpty())
                 <div class="text-center py-4">
                     <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
                     <p class="text-muted">Chưa có giao dịch nào</p>
                 </div>
-            `;
-            return;
-        }
-        
-        container.innerHTML = transactions.map(tx => `
-            <div class="transaction-item">
-                <div class="transaction-info">
-                    <div class="transaction-icon">
-                        <i class="fas fa-${tx.type === 'contract' ? 'file-contract' : 'exchange-alt'}"></i>
-                    </div>
-                    <div class="transaction-details">
-                        <div class="transaction-hash">
-                            ${truncateHash(tx.hash)}
-                            <button class="btn btn-sm btn-link p-0 ms-2" onclick="copyToClipboard('${tx.hash}')" style="font-size: 0.75rem;">
-                                <i class="fas fa-copy"></i>
-                            </button>
+            @else
+                @foreach($recentBlocks as $block)
+                    @php $tx = json_decode($block->data, true); @endphp
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-icon">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <div class="transaction-details">
+                                <div class="transaction-hash">
+                                    {{ substr($block->hash, 0, 10) . '...' . substr($block->hash, -8) }}
+                                    <a href="{{ route('transaction.show', ['id' => $block->id]) }}" class="btn btn-sm btn-link p-0 ms-2" style="font-size: 0.75rem;">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                                <div class="transaction-meta">
+                                    <i class="fas fa-user"></i> {{ $tx['sender'] ?? '-' }}
+                                    <i class="fas fa-arrow-right mx-1"></i>
+                                    <i class="fas fa-user-check"></i> {{ $tx['receiver'] ?? '-' }}
+                                </div>
+                            </div>
                         </div>
-                        <div class="transaction-meta">
-                            <i class="fas fa-user"></i> ${truncateHash(tx.from)} 
-                            <i class="fas fa-arrow-right mx-1"></i> 
-                            <i class="fas fa-user-check"></i> ${tx.type === 'contract' ? tx.to : truncateHash(tx.to)}
+                        <div class="transaction-amount">
+                            {{ number_format($tx['amount'] ?? 0, 0, ',', '.') }} VND
+                        </div>
+                        <div class="transaction-status status-success">
+                            <i class="fas fa-check-circle"></i> Thành công
+                        </div>
+                        <div class="text-muted" style="font-size: 0.75rem; min-width: 100px;">
+                            <i class="far fa-clock"></i> {{ $block->created_at->diffForHumans() }}
                         </div>
                     </div>
-                </div>
-                <div class="transaction-amount">
-                    ${formatAmount(tx.amount)}
-                </div>
-                <div class="transaction-status status-${tx.status}">
-                    ${tx.status === 'success' ? '<i class="fas fa-check-circle"></i> Thành công' : '<i class="fas fa-clock"></i> Đang xử lý'}
-                </div>
-                <div class="text-muted" style="font-size: 0.75rem; min-width: 100px;">
-                    <i class="far fa-clock"></i> ${formatTime(tx.timestamp)}
-                </div>
-            </div>
-        `).join('');
-    }
-
-    // Copy to clipboard
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            showNotification('Đã sao chép!', 'success');
-        }).catch(() => {
-            showNotification('Không thể sao chép', 'error');
-        });
-    }
-
-    // Show notification
-    function showNotification(message, type = 'success') {
-        const notification = document.createElement('div');
-        notification.className = 'toast-notification';
-        notification.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: ${type === 'success' ? '#10b981' : '#ef4444'};
-            color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            z-index: 9999;
-            animation: slideInRight 0.3s ease-out;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        `;
-        notification.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
-            ${message}
-        `;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.style.animation = 'slideInRight 0.3s ease-out reverse';
-            setTimeout(() => notification.remove(), 300);
-        }, 2000);
-    }
-
-    // Initialize page
-    document.addEventListener('DOMContentLoaded', () => {
-        updateStats();
-        
-        // Simulate loading delay
-        setTimeout(() => {
-            renderTransactions(mockTransactions);
-        }, 1000);
-        
-        // Auto refresh stats every 30 seconds
-        setInterval(() => {
-            // In real app, fetch new data here
-            console.log('Refreshing data...');
-        }, 30000);
-    });
-</script>
-
-<!-- Add animation keyframes if not present -->
-<style>
-    @keyframes slideInRight {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-</style>
+                @endforeach
+            @endif
+        </div>
+    </div>
+</div>
 @endsection

@@ -242,11 +242,11 @@
             .headline {
                 font-size: 2rem;
             }
-            
+
             .stat-number {
                 font-size: 1.5rem;
             }
-            
+
             body {
                 padding: 1rem 0;
             }
@@ -351,58 +351,15 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Mock data for demonstration
-        const blocksData = [
-            {
-                block_index: 1,
-                data: "Genesis Block - Khởi tạo chuỗi khối",
-                hash: "0000a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234",
-                previous_hash: "0000000000000000000000000000000000000000000000000000000000000000",
-                created_at: "2024-01-15 10:30:25"
-            },
-            {
-                block_index: 2,
-                data: "Giao dịch: Chuyển 50 BTC từ Alice sang Bob",
-                hash: "0000b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef12345",
-                previous_hash: "0000a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234",
-                created_at: "2024-01-15 10:35:42"
-            },
-            {
-                block_index: 3,
-                data: "Smart Contract: Deploy hợp đồng thông minh",
-                hash: "0000c3d4e5f67890abcdef1234567890abcdef1234567890abcdef123456",
-                previous_hash: "0000b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef12345",
-                created_at: "2024-01-15 10:42:18"
-            },
-            {
-                block_index: 4,
-                data: "Giao dịch: Chuyển 100 ETH cho dự án DeFi",
-                hash: "0000d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567",
-                previous_hash: "0000c3d4e5f67890abcdef1234567890abcdef1234567890abcdef123456",
-                created_at: "2024-01-15 10:48:03"
-            },
-            {
-                block_index: 5,
-                data: "NFT Mint: 1000 token không thể thay thế",
-                hash: "0000e5f67890abcdef1234567890abcdef1234567890abcdef12345678",
-                previous_hash: "0000d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567",
-                created_at: "2024-01-15 10:55:37"
-            },
-            {
-                block_index: 6,
-                data: "Cập nhật validator set - 5 node mới tham gia",
-                hash: "0000f67890abcdef1234567890abcdef1234567890abcdef123456789",
-                previous_hash: "0000e5f67890abcdef1234567890abcdef1234567890abcdef12345678",
-                created_at: "2024-01-15 11:02:14"
-            }
-        ];
+        // Use server-provided blocks data (from DB) instead of hard-coded mock data
+        const blocksData = @json($blocks);
 
         // Format date
         function formatDate(dateString) {
             const date = new Date(dateString);
             const now = new Date();
             const diff = Math.floor((now - date) / 1000);
-            
+
             if (diff < 60) return `${diff} giây trước`;
             if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
             if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
@@ -419,7 +376,7 @@
         function copyToClipboard(text, element) {
             navigator.clipboard.writeText(text).then(() => {
                 showToast('Đã sao chép!', 'success');
-                
+
                 // Visual feedback on button
                 const originalHTML = element.innerHTML;
                 element.innerHTML = '<i class="fas fa-check"></i>';
@@ -440,7 +397,7 @@
                 ${message}
             `;
             document.body.appendChild(toast);
-            
+
             setTimeout(() => {
                 toast.style.animation = 'slideInRight 0.3s ease-out reverse';
                 setTimeout(() => toast.remove(), 300);
@@ -451,13 +408,13 @@
         function renderBlocks(blocks) {
             const container = document.getElementById('blocksContainer');
             container.innerHTML = '';
-            
+
             blocks.forEach((block, index) => {
                 const delay = index * 0.05;
                 const card = document.createElement('div');
                 card.className = 'col-md-6 col-lg-4 mb-4';
                 card.style.animationDelay = `${delay}s`;
-                
+
                 card.innerHTML = `
                     <div class="block-card">
                         <div class="card-header">
@@ -502,8 +459,8 @@
                                     </button>
                                 </div>
                                 <div class="info-content hash-text">
-                                    ${block.previous_hash === '0000000000000000000000000000000000000000000000000000000000000000' 
-                                        ? '<span class="text-muted">Genesis Block</span>' 
+                                    ${block.previous_hash === '0000000000000000000000000000000000000000000000000000000000000000'
+                                        ? '<span class="text-muted">Genesis Block</span>'
                                         : block.previous_hash}
                                 </div>
                             </div>
@@ -520,7 +477,7 @@
                         </div>
                     </div>
                 `;
-                
+
                 container.appendChild(card);
             });
         }
@@ -535,10 +492,10 @@
         // Update statistics
         function updateStatistics(blocks) {
             const totalBlocks = blocks.length;
-            const latestBlock = blocks[blocks.length - 1].block_index;
+            const latestBlock = blocks.length ? blocks[0].block_index : 0;
             const totalDataSize = blocks.reduce((sum, block) => sum + (block.data.length || 0), 0);
             const totalKB = (totalDataSize / 1024).toFixed(2);
-            
+
             document.getElementById('totalBlocks').textContent = totalBlocks;
             document.getElementById('latestBlock').textContent = latestBlock;
             document.getElementById('totalData').textContent = totalKB;
@@ -548,7 +505,7 @@
         function init() {
             renderBlocks(blocksData);
             updateStatistics(blocksData);
-            
+
             // Add refresh button to header
             const headerSection = document.querySelector('.header-section');
             const refreshBtn = document.createElement('button');
